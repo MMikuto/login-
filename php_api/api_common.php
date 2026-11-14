@@ -52,9 +52,18 @@ function request_data()
     return $data;
 }
 
+function require_role($role)
+{
+    if (empty($_SESSION['account_role'])) {
+        json_response(['success' => false, 'message' => 'กรุณาเข้าสู่ระบบ'], 401);
+    }
+
+    if ($_SESSION['account_role'] !== $role) {
+        json_response(['success' => false, 'message' => 'ไม่มีสิทธิ์ดำเนินการนี้'], 403);
+    }
+}
+
 function require_admin()
 {
-    if (empty($_SESSION['admin_id'])) {
-        json_response(['success' => false, 'message' => 'กรุณาเข้าสู่ระบบผู้ดูแล'], 401);
-    }
+    require_role('admin');
 }

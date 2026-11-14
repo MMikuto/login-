@@ -1,13 +1,18 @@
 const apiBase = (process.env.VUE_APP_API_BASE_URL || '/project_login/php_api')
   .replace(/\/+$/, '')
 
+export function apiUrl(path) {
+  return `${apiBase}/${path}`
+}
+
 export async function apiRequest(path, options = {}) {
   const headers = { ...options.headers }
-  if (options.body && !headers['Content-Type']) {
+  const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData
+  if (options.body && !isFormData && !headers['Content-Type']) {
     headers['Content-Type'] = 'application/json'
   }
 
-  const response = await fetch(`${apiBase}/${path}`, {
+  const response = await fetch(apiUrl(path), {
     credentials: 'include',
     ...options,
     headers

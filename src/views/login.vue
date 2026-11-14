@@ -2,16 +2,16 @@
   <main class="login-page">
     <section class="login-panel">
       <header class="topbar">
-        <router-link class="brand" to="/" aria-label="Leave System home">
+        <router-link class="brand" to="/" aria-label="LeaveFlow admin login">
           <span class="brand-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none">
               <rect x="4" y="5" width="16" height="16" rx="3" />
               <path d="M8 3v4m8-4v4M4 10h16m-11 5 2 2 4-4" />
             </svg>
           </span>
-          <span>LEAVE SYSTEM</span>
+          <span></span>
         </router-link>
-        <span class="login-tag">LOGIN</span>
+        <span class="login-tag">{{ role === 'admin' ? 'ADMIN LOGIN' : 'USER LOGIN' }}</span>
       </header>
 
       <section class="login-content" aria-labelledby="login-title">
@@ -21,8 +21,17 @@
             <path d="M4.5 20a7.5 7.5 0 0 1 15 0" />
           </svg>
         </div>
-        <h1 id="login-title">Welcome Back</h1>
-        <p class="subtitle">เข้าสู่ระบบขอลาอนุญาตลา</p>
+        <h1 id="login-title">{{ role === 'admin' ? 'Admin Login' : 'User Login' }}</h1>
+        <p class="subtitle">{{ role === 'admin' ? 'เข้าสู่ระบบผู้ดูแลระบบ' : 'เข้าสู่ระบบผู้ใช้งาน' }}</p>
+
+        <div class="role-switch" role="group" aria-label="เลือกประเภทบัญชี">
+          <button type="button" :class="{ selected: role === 'user' }" @click="role = 'user'">
+            User
+          </button>
+          <button type="button" :class="{ selected: role === 'admin' }" @click="role = 'admin'">
+            Admin
+          </button>
+        </div>
 
         <form class="login-form" @submit.prevent="login">
           <label for="username">Username</label>
@@ -79,7 +88,7 @@
         </form>
       </section>
 
-      <footer class="footer">LEAVE MANAGEMENT SYSTEM © 2026</footer>
+      <footer class="footer">68703256 "©" 2026</footer>
     </section>
   </main>
 </template>
@@ -93,6 +102,7 @@ export default {
     return {
       username: '',
       password: '',
+      role: 'user',
       error: '',
       loading: false,
       showPassword: false
@@ -107,11 +117,12 @@ export default {
         await apiRequest('auth.php', {
           method: 'POST',
           body: JSON.stringify({
+            role: this.role,
             username: this.username,
             password: this.password
           })
         })
-        await this.$router.push('/welcome')
+        await this.$router.push(this.role === 'admin' ? '/admin' : '/welcome')
       } catch (error) {
         this.error = error.message
       } finally {
@@ -235,6 +246,32 @@ h1 {
   color: #913be8;
   font-size: 13px;
   text-align: center;
+}
+
+.role-switch {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  width: min(100%, 360px);
+  margin: 0 auto 20px;
+  border: 1px solid #392749;
+  border-radius: 9px;
+  background: #100d18;
+  padding: 3px;
+}
+
+.role-switch button {
+  min-height: 36px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #bda9cf;
+  cursor: pointer;
+  font: inherit;
+}
+
+.role-switch button.selected {
+  background: #30203d;
+  color: #e7c9ff;
 }
 
 .login-form label {
